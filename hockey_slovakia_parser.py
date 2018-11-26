@@ -1,10 +1,13 @@
 ﻿import argparse
 
 import csv
+from pathlib import Path
 import datetime
-import urllib.request
 
+import urllib.request
 from bs4 import BeautifulSoup
+
+
 
 DOMAIN = "https://www.hockeyslovakia.sk"
 BASE_URL = "https://www.hockeyslovakia.sk/sk/stats/live-matches/"
@@ -12,54 +15,53 @@ BASE_URL = "https://www.hockeyslovakia.sk/sk/stats/live-matches/"
 path_to_save = r"D:\Google Drive\pythonCrawler\sport_matches.csv"
 
 
-def main():
-    matches_list = []
+def parser():
+    hockey_matches = []
 
     # For local tests:
 
-    # matches_list.extend(parse(open(r"D:\test.html", "r", encoding="utf-8").read()))
-    # print_matches_list(matches_list)
+    # hockey_matches.extend(get_matches(open(r"D:\test.html", "r", encoding="utf-8").read()))
+    # print_matches_list(hockey_matches)
 
     # Being online:
-    next_day = datetime.datetime.now()
+    next_day = datetime.date.today()
+    month_from_today = datetime.date.today() + datetime.timedelta(365/12)
     # We're looking for matches taking place the next -n- month
-    while next_day.month <= datetime.datetime.now().month + 1:
+    while next_day < month_from_today:
         # https://www.hockeyslovakia.sk/sk/stats/live-matches?Day=16.08.2018
-        matches_list.extend(
-            parse(get_html(BASE_URL + "?Day=" + next_day.strftime("%d.%m.%Y"))))
+        hockey_matches.extend(
+            get_matches(get_html(BASE_URL + "?Day=" + next_day.strftime("%d.%m.%Y"))))
         print("Parsing of day {} has been completed.".format(
             next_day.strftime("%d.%m.%Y")))
         next_day = next_day + datetime.timedelta(days=1)
         # break
 
-    # print_matches_list(
-    #     list(filter(lambda match: "KOŠICE" in match['place'].upper() or "MICHALOVCE" in match[
-    #         'place'].upper() or "SPÍŠSKÁ NOVÁ VES" in match['place'].upper() or "PREŠOV" in match[
-    #                                   'place'].upper() or "VRANOV" in match['place'].upper(),
-    #                 matches_list)))
-
-    matches_list = list(filter((lambda match: match["age"] not in ["U14", "U16"] and membership(
-        match["place"]) and "tipsport" not in match["tournament"].lower()), matches_list))
-    # matches_list = list(filter(lambda match: membership(match["place"]), matches_list))
-    print_matches_list(matches_list)
-
-    # Make sense from out of this whole thing..
-    save(matches_list, path_to_save)
+    hockey_matches = list(filter((lambda match: match["age"] not in ["U14", "U16"]
+                                  and
+                                  membership(match["place"])
+                                  and
+                                  "tipsport" not in match["tournament"].lower()), hockey_matches))
+    # hockey_matches = list(filter(lambda match: membership(match["place"]), hockey_matches))
+    # print_matches_list(hockey_matches)
+    return hockey_matches
+    
 
 
-# TODO: ENSURE THE FORMAT OF SAVING INTO CSV TO EASILY COPY-PASTE INTO THE MAIN SPREAD SHEET
 def save(matches_list, path):
-    for match in matches_list:
-        match['time'] = datetime.datetime.strptime(
-            match['time'], "%H:%M") + datetime.timedelta(hours=1)
-        match['time'] = match['time'].strftime("%H:%M")
+    try:
+        for match in matches_list:
+            match['time'] = datetime.datetime.strptime(
+                match['time'], "%H:%M") + datetime.timedelta(hours=2)
+            match['time'] = match['time'].strftime("%H:%M")
+    except ValueError:
+        match['time'] = ' '
 
     with open(path, 'w', encoding="utf-8", newline='') as csv_file:
         writer = csv.writer(csv_file, dialect='excel')
         writer.writerow(('Date', 'Time', 'Hockey', 'Tournament',
                          'Home', 'Age', "", 'Guests', 'Age', 'Place', 'URL'))
         for match in matches_list:
-            writer.writerow((match['date'], match['time'], "Хоккей",
+            writer.writerow((match['date'], match['time'], match['sportname'],
                              match['tournament'],
                              match['home'], match['age'], "vs",
                              match['guest'], match['age'],
@@ -95,7 +97,7 @@ def get_age(tournament):
         return "Взрослые"
 
 
-def parse(html):
+def get_matches(html):
     # the entire page
     soup = BeautifulSoup(html, features="html.parser")
     # soup.find_parent('div', class_='panel-body')
@@ -108,6 +110,7 @@ def parse(html):
     for row in rows:
         cols = row.findAll('td')
         matches.append({
+            'sportname': "Хоккей",
             'tournament': row.find_parent('div', class_='panel-body').div.text.strip(),
             'home': cols[0].div.text.strip(),
             'guest': cols[2].div.text.strip(),
@@ -136,14 +139,16 @@ def membership(place):
 
 def test():
     time = "14:00"
-    hour = datetime.timedelta(hours=1)
+    hour = datetime.timedelta(hour = 1)
     time_obj = datetime.datetime.strptime(time, "%H:%M") + hour
 
     print(time_obj.strftime("%H:%M"))
 
 
 if __name__ == '__main__':
-    main()
+    matches = parser()
+    # print(matches)
+    save(matches, Path().absolute() / r"csv\hockey_matches.csv")
     # test()
     # TODO: Implement support of arguments, such as PATH, DAYS_AHEAD, CITIES, AGE CATEGORIES
     # parser = argparse.ArgumentParser()

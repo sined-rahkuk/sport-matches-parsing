@@ -9,3 +9,7 @@ This .py file itself enables to gather matches for multiple.py use or to form ho
 # szfb_parser.py
 
 This .py file itself enables to gather matches for multiple.py use or to form florball.csv if you execute it on its own
+
+# ms_basket.py
+
+This .py file itself enables to gather matches for multiple.py use or to form basketball.csv if you execute it on its own

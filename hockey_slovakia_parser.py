@@ -1,13 +1,9 @@
-﻿import argparse
-
-import csv
-from pathlib import Path
+﻿import csv
 import datetime
-
 import urllib.request
+from pathlib import Path
+
 from bs4 import BeautifulSoup
-
-
 
 DOMAIN = "https://www.hockeyslovakia.sk"
 BASE_URL = "https://www.hockeyslovakia.sk/sk/stats/live-matches/"
@@ -31,8 +27,8 @@ def parser():
         # https://www.hockeyslovakia.sk/sk/stats/live-matches?Day=16.08.2018
         hockey_matches.extend(
             get_matches(get_html(BASE_URL + "?Day=" + next_day.strftime("%d.%m.%Y"))))
-        print("Parsing of day {} has been completed.".format(
-            next_day.strftime("%d.%m.%Y")))
+        # print("[HOCKEY] Parsing of day {} has been completed.".format(
+        # next_day.strftime("%d.%m.%Y")))
         next_day = next_day + datetime.timedelta(days=1)
         # break
 
@@ -43,8 +39,10 @@ def parser():
                                   "tipsport" not in match["tournament"].lower()), hockey_matches))
     # hockey_matches = list(filter(lambda match: membership(match["place"]), hockey_matches))
     # print_matches_list(hockey_matches)
+    print('[HOCKEY] Parsing and collecting completed! Result: %d' %
+          len(hockey_matches))
+
     return hockey_matches
-    
 
 
 def save(matches_list, path):
@@ -139,7 +137,7 @@ def membership(place):
 
 def test():
     time = "14:00"
-    hour = datetime.timedelta(hour = 1)
+    hour = datetime.timedelta(hour=1)
     time_obj = datetime.datetime.strptime(time, "%H:%M") + hour
 
     print(time_obj.strftime("%H:%M"))

@@ -1,16 +1,13 @@
 # import csv
 # import datetime
 
-from hockey_slovakia_parser import membership
-from hockey_slovakia_parser import get_age
-from hockey_slovakia_parser import print_matches_list
-from hockey_slovakia_parser import save
-
-
 import urllib.request
+from pathlib import Path
+
 from bs4 import BeautifulSoup
 
-from pathlib import Path
+from hockey_slovakia_parser import (get_age, membership, print_matches_list,
+                                    save)
 
 
 def parser():
@@ -44,6 +41,8 @@ def parser():
                 'age': get_age(columns[0].text.strip().split('\n')[0]),
                 'place': ""
             })
+    print('[FLORBALL] Parsing and collecting completed! Result: %d' %
+          len(matches))
     return matches
 
 

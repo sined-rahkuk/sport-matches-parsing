@@ -58,7 +58,7 @@ def save(matches_list, path):
 
     with open(path, 'w', encoding="utf-8", newline='') as csv_file:
         writer = csv.writer(csv_file, dialect='excel')
-        writer.writerow(('Date', 'Time', 'Hockey', 'Tournament',
+        writer.writerow(('Date', 'Time', 'Sport', 'Tournament',
                          'Home', 'Age', "", 'Guests', 'Age', 'Place', 'URL'))
         for match in matches_list:
             writer.writerow((match['date'], match['time'], match['sportname'],

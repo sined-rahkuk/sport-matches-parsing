@@ -8,8 +8,6 @@ from bs4 import BeautifulSoup
 DOMAIN = "https://www.hockeyslovakia.sk"
 BASE_URL = "https://www.hockeyslovakia.sk/sk/stats/live-matches/"
 
-path_to_save = r"D:\Google Drive\pythonCrawler\sport_matches.csv"
-
 
 def parser():
     hockey_matches = []

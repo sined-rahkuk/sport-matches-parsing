@@ -1,9 +1,11 @@
 ﻿import csv
 import datetime
 import urllib.request
+import requests
 from pathlib import Path
 
 from bs4 import BeautifulSoup
+
 
 DOMAIN = "https://www.hockeyslovakia.sk"
 BASE_URL = "https://www.hockeyslovakia.sk/sk/stats/live-matches/"
@@ -44,14 +46,23 @@ def parser():
 
 
 def save(matches_list, path):
+
+    from config import api_key
+
+    api_res = requests.get(
+            f'http://api.timezonedb.com/v2.1/convert-time-zone?key={api_key}&format=json&from=Europe/Bratislava&to=Europe/Moscow').json()
+    offset = api_res['offset'] if api_res['status'] == 'OK' else 3600
+    print(offset)
+    
+
     for match in matches_list:
         try:
-            print(match['time'])
             match['time'] = datetime.datetime.strptime(
-                match['time'], "%H:%M") + datetime.timedelta(hours=2)
+                # fix the time according to Moscow
+
+                match['time'], "%H:%M") + datetime.timedelta(seconds=offset)
 
             match['time'] = match['time'].strftime("%H:%M")
-            print(match['time'])
         except ValueError:
             match['time'] = ' '
             print('im here within an err')

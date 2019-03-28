@@ -38,7 +38,7 @@ def parser():
                and
                'žia' not in tournament
                and
-               'U16' not in get_age(tournament) ):
+               'U' not in get_age(tournament) ):
 
                 matches.append({
                     'sportname': "Баскетбол",

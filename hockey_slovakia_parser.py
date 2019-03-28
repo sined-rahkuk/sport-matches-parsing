@@ -44,13 +44,17 @@ def parser():
 
 
 def save(matches_list, path):
-    try:
-        for match in matches_list:
+    for match in matches_list:
+        try:
+            print(match['time'])
             match['time'] = datetime.datetime.strptime(
                 match['time'], "%H:%M") + datetime.timedelta(hours=2)
+
             match['time'] = match['time'].strftime("%H:%M")
-    except ValueError:
-        match['time'] = ' '
+            print(match['time'])
+        except ValueError:
+            match['time'] = ' '
+            print('im here within an err')
 
     with open(path, 'w', encoding="utf-8", newline='') as csv_file:
         writer = csv.writer(csv_file, dialect='excel')
@@ -143,7 +147,7 @@ def test():
 
 if __name__ == '__main__':
     matches = parser()
-    # print(matches)
+    print_matches_list(matches)
     save(matches, Path().absolute() / r"csv\hockey_matches.csv")
     # test()
     # TODO: Implement support of arguments, such as PATH, DAYS_AHEAD, CITIES, AGE CATEGORIES

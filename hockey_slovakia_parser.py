@@ -50,10 +50,9 @@ def save(matches_list, path):
     from config import api_key
 
     api_res = requests.get(
-            f'http://api.timezonedb.com/v2.1/convert-time-zone?key={api_key}&format=json&from=Europe/Bratislava&to=Europe/Moscow').json()
+        f'http://api.timezonedb.com/v2.1/convert-time-zone?key={api_key}&format=json&from=Europe/Bratislava&to=Europe/Moscow').json()
     offset = api_res['offset'] if api_res['status'] == 'OK' else 3600
     print(offset)
-    
 
     for match in matches_list:
         try:
@@ -67,7 +66,7 @@ def save(matches_list, path):
             match['time'] = ' '
             print('im here within an err')
 
-    with open(path, 'w', encoding="utf-8", newline='') as csv_file:
+    with open(path, 'w+', encoding="utf-8", newline='') as csv_file:
         writer = csv.writer(csv_file, dialect='excel')
         writer.writerow(('Date', 'Time', 'Sport', 'Tournament',
                          'Home', 'Age', "", 'Guests', 'Age', 'Place', 'URL'))
